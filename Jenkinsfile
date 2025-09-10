@@ -15,13 +15,9 @@ pipeline {
             }
         }
 
-       stage('Build Jar (Docker Maven with Java 17)') {
+      stage('Build Jar') {
             steps {
-                sh """
-                docker run --rm \
-                  -v \$PWD:/workspace -w /workspace \
-                  maven:3.9.0-openjdk-17 mvn clean package -DskipTests
-                """
+                sh './mvn clean package -DskipTests'
             }
         }
 
