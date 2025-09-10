@@ -15,11 +15,15 @@ pipeline {
             }
         }
 
-      stage('Build Jar') {
-            steps {
-                sh './mvn clean package -DskipTests'
-            }
-        }
+   stage('Build Jar') {
+    steps {
+        sh """
+        docker run --rm \
+          -v \$PWD:/workspace -w /workspace \
+          maven:3.9.0-openjdk-17 mvn clean package -DskipTests
+        """
+    }
+}
 
         stage('Build Docker Image') {
             steps {
