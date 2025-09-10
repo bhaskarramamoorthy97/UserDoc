@@ -1,15 +1,13 @@
-# Use Java 17 JDK slim image
-FROM openjdk:17-jdk-slim
+# Stage 1: Build the JAR with Maven and Java 17
+FROM maven:3.9.0-eclipse-temurin-17 AS build
+WORKDIR /workspace
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-# Set working directory inside the container
+# Stage 2: Run the app using Java 21
+FROM eclipse-temurin:21-jdk
 WORKDIR /app
-
-# Copy the jar file from target folder to container
-COPY target/my-first-app.jar my-first-app.jar
-
-# Expose port your app runs on
+COPY --from=build /workspace/target/my-first-app.jar my-first-app.jar
 EXPOSE 8080
-
-# Command to run the jar
 CMD ["java", "-jar", "my-first-app.jar"]
-

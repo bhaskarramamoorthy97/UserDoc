@@ -2,9 +2,8 @@ pipeline {
     agent any
 
     environment {
-        APP_EC2_IP = 'ec2-54-167-15-63.compute-1.amazonaws.com' // Your EC2 public IP
-        DOCKER_IMAGE = 'myfirstapp:latest'                   // Docker image name
-        JAR_NAME = 'target/my-first-app.jar'      // Adjust to your actual JAR
+        APP_EC2_IP = 'ec2-54-167-15-63.compute-1.amazonaws.com'
+        DOCKER_IMAGE = 'myfirstapp:latest'
     }
 
     stages {
@@ -15,17 +14,7 @@ pipeline {
             }
         }
 
-   stage('Build Jar') {
-    steps {
-        sh """
-        docker run --rm \
-          -v \$PWD:/workspace -w /workspace \
-          maven:3.9.0-openjdk-17 mvn clean package -DskipTests
-        """
-    }
-}
-
-        stage('Build Docker Image') {
+        stage('Build & Dockerize') {
             steps {
                 sh "docker build -t ${DOCKER_IMAGE} ."
             }
@@ -33,17 +22,15 @@ pipeline {
 
         stage('Deploy to App Server') {
             steps {
-                sshagent(['myapp-creds-ec2user']) {   // Use your Jenkins SSH credential ID
+                sshagent(['myapp-creds-ec2user']) {
                     sh """
-                    # Copy files to EC2 server
-                    scp -o StrictHostKeyChecking=no ${JAR_NAME} ec2-user@${APP_EC2_IP}:/home/ec2-user/
-                    scp -o StrictHostKeyChecking=no Dockerfile ec2-user@${APP_EC2_IP}:/home/ec2-user/
+                    # Copy Docker image to EC2 server (optional: you can push to a registry instead)
+                    docker save ${DOCKER_IMAGE} | bzip2 | ssh -o StrictHostKeyChecking=no ec2-user@${APP_EC2_IP} 'bunzip2 | docker load'
 
-                    # Connect to EC2 and deploy Docker container
+                    # Run the container on EC2
                     ssh -o StrictHostKeyChecking=no ec2-user@${APP_EC2_IP} '
                         docker stop myapp-container || true
                         docker rm myapp-container || true
-                        docker build -t ${DOCKER_IMAGE} /home/ec2-user/
                         docker run -d -p 8080:8080 --name myapp-container ${DOCKER_IMAGE}
                     '
                     """
@@ -57,7 +44,7 @@ pipeline {
             echo "Deployment successful!"
         }
         failure {
-            echo "Deployment failed. Check the logs!"
+            echo "Deployment failed. Check logs!"
         }
     }
 }
