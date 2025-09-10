@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        APP_EC2_IP = 'ec2-52-90-147-94.compute-1.amazonaws.com' // Your EC2 public IP
+        APP_EC2_IP = 'ec2-54-167-15-63.compute-1.amazonaws.com' // Your EC2 public IP
         DOCKER_IMAGE = 'myfirstapp:latest'                   // Docker image name
         JAR_NAME = 'target/my-first-app.jar'      // Adjust to your actual JAR
     }
