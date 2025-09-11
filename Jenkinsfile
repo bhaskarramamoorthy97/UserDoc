@@ -21,22 +21,20 @@ pipeline {
         }
 
         stage('Deploy to App Server') {
-            steps {
-                sshagent(['myapp-creds-ec2user']) {
-                    sh """
-                    # Copy Docker image to EC2 server (optional: you can push to a registry instead)
-                    docker save ${DOCKER_IMAGE} | bzip2 | ssh -o StrictHostKeyChecking=no ec2-user@${APP_EC2_IP} 'bunzip2 | docker load'
+    steps {
+        sh """
+        # Copy Docker image to EC2 server
+        docker save ${DOCKER_IMAGE} | bzip2 | ssh -i /root/NewJenkinsServer.pem -o StrictHostKeyChecking=no ec2-user@${APP_EC2_IP} 'bunzip2 | docker load'
 
-                    # Run the container on EC2
-                    ssh -o StrictHostKeyChecking=no ec2-user@${APP_EC2_IP} '
-                        docker stop myapp-container || true
-                        docker rm myapp-container || true
-                        docker run -d -p 8080:8080 --name myapp-container ${DOCKER_IMAGE}
-                    '
-                    """
-                }
-            }
-        }
+        # Run the container on EC2
+        ssh -i /root/NewJenkinsServer.pem -o StrictHostKeyChecking=no ec2-user@${APP_EC2_IP} '
+            docker stop myapp-container || true
+            docker rm myapp-container || true
+            docker run -d -p 8080:8080 --name myapp-container ${DOCKER_IMAGE}
+        '
+        """
+    }
+}
     }
 
     post {
