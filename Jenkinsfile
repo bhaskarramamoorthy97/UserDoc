@@ -30,7 +30,7 @@ pipeline {
                 ssh -i /root/MyFirstWebServer.pem -o StrictHostKeyChecking=no ec2-user@${APP_EC2_IP} '
                     docker stop myapp-container || true
                     docker rm myapp-container || true
-                    docker run -d --network spring-net --name myapp-container -p 8080:8080 --name myapp-container ${DOCKER_IMAGE}
+                    docker run -d --network mysql_default  --name myapp-container -p 8080:8080 --name myapp-container ${DOCKER_IMAGE}
                 '
                 """
             }
