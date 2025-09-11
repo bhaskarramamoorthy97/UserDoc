@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        APP_EC2_IP = 'ec2-34-202-235-176.compute-1.amazonaws.com'
+        APP_EC2_IP = 'ec2-34-224-18-48.compute-1.amazonaws.com'
         DOCKER_IMAGE = 'myfirstapp:latest'
     }
 
@@ -30,7 +30,7 @@ pipeline {
                 ssh -i /root/MyFirstWebServer.pem -o StrictHostKeyChecking=no ec2-user@${APP_EC2_IP} '
                     docker stop myapp-container || true
                     docker rm myapp-container || true
-                    docker run -d -p 8080:8080 --name myapp-container ${DOCKER_IMAGE}
+                    docker run -d --network spring-net --name myapp-container -p 8080:8080 --name myapp-container ${DOCKER_IMAGE}
                 '
                 """
             }
