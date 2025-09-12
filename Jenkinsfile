@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        APP_EC2_IP = 'ec2-34-224-18-48.compute-1.amazonaws.com'
+        APP_EC2_IP = 'ec2-34-207-242-226.compute-1.amazonaws.com'
         DOCKER_IMAGE = 'myfirstapp:latest'
     }
 
