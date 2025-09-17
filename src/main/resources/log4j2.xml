@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="30">
+    <Properties>
+        <Property name="local">localhost</Property>
+        <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %p %c - %m%n</Property>
+        <Property name="APP_LOG_ROOT">/var/log/myapp</Property>
+        <!-- <Property name="APP_LOG_ROOT">/Users/baskar/Desktop</Property> -->
+    </Properties>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT" follow="true">
+            <PatternLayout pattern="${LOG_PATTERN}" />
+        </Console>
+        <File name="appLog" fileName="${APP_LOG_ROOT}/MovieDataHub.log">
+            <PatternLayout pattern="${LOG_PATTERN}" />
+        </File>
+    </Appenders>
+    <Loggers>
+        <Logger name="com.samco" additivity="false" level="debug">
+            <AppenderRef ref="appLog" />
+            <AppenderRef ref="Console" />
+        </Logger>
+        <Root level="info">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="appLog" />
+        </Root>
+    </Loggers>
+</Configuration>

@@ -38,13 +38,13 @@ public class SpringSecuritiesConfig {
     public SecurityFilterChain securityFilterChan(HttpSecurity httpSecurity) throws Exception {
 
         return httpSecurity.csrf(customizer -> customizer.disable())
-                .authorizeHttpRequests(                        request -> request.requestMatchers("/login", "/saveusers").permitAll().anyRequest()
+                .authorizeHttpRequests(
+                        request -> request.requestMatchers("/login", "/saveusers").permitAll().anyRequest()
                                 .authenticated())
                 .httpBasic(org.springframework.security.config.Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
-
     }
 
     @Bean

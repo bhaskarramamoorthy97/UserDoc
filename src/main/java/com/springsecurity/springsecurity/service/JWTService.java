@@ -9,15 +9,22 @@ import java.util.function.Function;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j
 public class JWTService {
+
+    @Value("${jwt.secret}")
+    private String secret;
 
     private String secrtetKey = "";
 
@@ -40,8 +47,8 @@ public class JWTService {
                 .addClaims(claims)
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 60 * 60
-                        * 30))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60
+                        * 10))
                 .signWith(
                         key())
                 .compact();
@@ -49,7 +56,7 @@ public class JWTService {
     }
 
     private SecretKey key() {
-        byte[] keyBytes = Decoders.BASE64.decode(secrtetKey);
+        byte[] keyBytes = Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
@@ -73,7 +80,11 @@ public class JWTService {
 
     public boolean validateToken(String token, UserDetails userDetails) {
         final String userName = extractUserName(token);
-        return (userName.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        final boolean expired = isTokenExpired(token);
+        log.info("Token username: {}, UserDetails username: {}, expired: {}",
+                userName, userDetails.getUsername(),
+                expired);
+        return (userName.equals(userDetails.getUsername()) && !expired);
     }
 
     private boolean isTokenExpired(String token) {

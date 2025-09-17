@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,8 +15,10 @@ import com.springsecurity.springsecurity.dto.Users;
 import com.springsecurity.springsecurity.service.SpringUsersServiceImpl;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
+@Slf4j
 public class SpringSecurity {
 
     @Autowired
@@ -37,7 +40,8 @@ public class SpringSecurity {
     }
 
     @GetMapping("/getstudnets")
-    public List<Students> getStudents() {
+    public List<Students> getStudents(final Authentication authentication) {
+        log.info("authentication: ", authentication.getName());
         return listStudents;
     }
 

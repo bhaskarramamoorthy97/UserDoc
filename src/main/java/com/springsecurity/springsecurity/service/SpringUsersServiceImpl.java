@@ -14,7 +14,10 @@ import org.springframework.stereotype.Service;
 import com.springsecurity.springsecurity.dto.Users;
 import com.springsecurity.springsecurity.repo.UserRepo;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class SpringUsersServiceImpl implements UserDetailsService {
 
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
@@ -33,8 +36,10 @@ public class SpringUsersServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         Users user = userRepo.findByUsername(username);
+        log.info("UserObject: {}", user);
         if (user == null) {
-            System.out.println("User not found");
+            // System.out.println("User not found");
+            log.info("username not found");
             throw new UsernameNotFoundException("User not found");
         }
         return new UserPrinciple(user);

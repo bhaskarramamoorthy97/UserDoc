@@ -18,8 +18,10 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j
 public class JwtFilter extends OncePerRequestFilter {
 
     @Autowired
@@ -37,19 +39,29 @@ public class JwtFilter extends OncePerRequestFilter {
         String username = null;
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            log.info("Auth Header: {}", authHeader);
             token = authHeader.substring(7);
             username = jwtService.extractUserName(token);
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = context.getBean(SpringUsersServiceImpl.class).loadUserByUsername(username);
-            if (jwtService.validateToken(token, userDetails)) {
+            log.info("Loaded userDetails: {}", userDetails);
+
+            boolean valid = jwtService.validateToken(token, userDetails);
+            log.info("Token valid: {}", valid);
+
+            if (valid) {
                 UsernamePasswordAuthenticationToken usernamePassAuth = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 usernamePassAuth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(usernamePassAuth);
+                log.info("Authentication set");
+            } else {
+                log.warn("Token invalid");
             }
         }
+
         filterChain.doFilter(request, response);
 
     }
