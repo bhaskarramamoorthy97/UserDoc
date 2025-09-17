@@ -32,19 +32,20 @@ pipeline {
 }
 
         stage('Deploy to App Server') {
-            steps {
-                sh """
-        # Save Docker image and load on remote server
-        docker save ${DOCKER_IMAGE} | ssh -i /root/MoviedataHub.pem -o StrictHostKeyChecking=no ec2-user@${APP_EC2_IP} 'docker load'
+           steps {
+                withCredentials([file(credentialsId: 'myapp-creds-ec2user', variable: 'PEM_FILE')]) {
+                    sh """
+                    # Save Docker image and load on remote server
+                    docker save ${DOCKER_IMAGE} | ssh -i ${PEM_FILE} -o StrictHostKeyChecking=no ec2-user@${APP_EC2_IP} 'docker load'
 
-        # Stop existing container, remove it, and run new one
-        ssh -i /root/MoviedataHub.pem -o StrictHostKeyChecking=no ec2-user@${APP_EC2_IP} '
-            docker stop myapp-container || true
-            docker rm myapp-container || true
-            docker run -d --network mysql_default --name myapp-container -p 8080:8080 ${DOCKER_IMAGE}
-        '
-        """
-            }
+                    # Stop existing container, remove it, and run new one
+                    ssh -i ${PEM_FILE} -o StrictHostKeyChecking=no ec2-user@${APP_EC2_IP} '
+                        docker stop myapp-container || true
+                        docker rm myapp-container || true
+                        docker run -d --network mysql_default --name myapp-container -p 8080:8080 ${DOCKER_IMAGE}
+                    '
+                    """
+                }
         }
     }
 
