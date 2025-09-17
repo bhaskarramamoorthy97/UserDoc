@@ -21,7 +21,7 @@ pipeline {
         }
 
         stage('Debug Info') {
-          steps {
+    steps {
         sh """
         whoami
         pwd
@@ -32,7 +32,7 @@ pipeline {
 }
 
         stage('Deploy to App Server') {
-           steps {
+            steps {
                 withCredentials([file(credentialsId: 'myapp-creds-ec2user', variable: 'PEM_FILE')]) {
                     sh """
                     # Save Docker image and load on remote server
@@ -46,6 +46,7 @@ pipeline {
                     '
                     """
                 }
+           }
         }
     }
 
