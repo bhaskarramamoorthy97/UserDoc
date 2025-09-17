@@ -33,7 +33,7 @@ pipeline {
 
         stage('Deploy to App Server') {
             steps {
-                withCredentials([file(credentialsId: 'myapp-creds-ec2user', variable: 'PEM_FILE')]) {
+                withCredentials([file(credentialsId: 'moviedatahub-pem', variable: 'PEM_FILE')]) {
                     sh """
                     # Save Docker image and load on remote server
                     docker save ${DOCKER_IMAGE} | ssh -i ${PEM_FILE} -o StrictHostKeyChecking=no ec2-user@${APP_EC2_IP} 'docker load'
