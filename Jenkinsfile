@@ -24,10 +24,10 @@ pipeline {
             steps {
                 sh """
                 # Copy Docker image to EC2 server
-                docker save ${DOCKER_IMAGE} | ssh -i /root/MoviedataHub.pem -o StrictHostKeyChecking=no ec2-user@${APP_EC2_IP} 'docker load'
+                docker save ${DOCKER_IMAGE} | sudo ssh -i /root/MoviedataHub.pem -o StrictHostKeyChecking=no ec2-user@${APP_EC2_IP} 'docker load'
 
                 # Run the container on EC2
-                ssh -i /root/MoviedataHub.pem -o StrictHostKeyChecking=no ec2-user@${APP_EC2_IP} '
+                sudo ssh -i /root/MoviedataHub.pem -o StrictHostKeyChecking=no ec2-user@${APP_EC2_IP} '
                     docker stop myapp-container || true
                     docker rm myapp-container || true
                     docker run -d --network mysql_default  --name myapp-container -p 8080:8080 --name myapp-container ${DOCKER_IMAGE}
