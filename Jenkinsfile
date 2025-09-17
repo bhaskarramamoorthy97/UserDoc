@@ -20,6 +20,17 @@ pipeline {
             }
         }
 
+        stage('Debug Info') {
+          steps {
+        sh """
+        whoami
+        pwd
+        ls -la /root/
+        ls -la /var/jenkins_home/
+        """
+    }
+}
+
         stage('Deploy to App Server') {
             steps {
                 sh """
